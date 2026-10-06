@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Header } from "@/components/Header"
-import { SAMPLES, availableCategories, samplesFor, type CategoryId, type FieldId, type GroupId } from "@/data"
+import { availableCategories, samplesFor, type CategoryId, type FieldId, type GroupId } from "@/data"
 import { FieldSelect } from "@/screens/FieldSelect"
 import { Inquiry } from "@/screens/Inquiry"
 import { SampleView } from "@/screens/SampleView"
@@ -32,8 +32,6 @@ export default function App() {
   // 탐색 유형 카드에서 카테고리 직접 진입: 분야 미지정(전체 분야)
   const enterCategory = (c: CategoryId) => update({ screen: "samples", field: null, category: c, sampleId: firstSample(null, c) })
 
-  const sample = SAMPLES.find((s) => s.id === state.sampleId)
-
   return (
     <div className="flex min-h-dvh flex-col [--header-h:56px] md:[--header-h:64px]">
       <Header onHome={() => update({ screen: "fields", group: null })} onContact={() => update({ screen: "inquiry" })} />
@@ -63,7 +61,6 @@ export default function App() {
           context={{
             field: state.field,
             category: state.category,
-            sample: sample ? `${sample.title} · ${sample.region}` : null,
           }}
           // 샘플을 고른 적 없이(Contact Us) 들어왔으면 고를 곳인 첫 화면으로
           onBack={() => update({ screen: state.category ? "samples" : "fields" })}
