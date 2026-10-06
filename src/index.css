@@ -1,0 +1,29 @@
+@import "tailwindcss";
+@import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
+
+@theme {
+  /* ponytail: 피그마의 Degular·Inter는 미설치, Pretendard로 통일 */
+  --font-sans: "Pretendard Variable", Pretendard, sans-serif;
+  --color-ink: #383838;
+  --color-ink-strong: #262626;
+  --color-line: #d9d9d9;
+  --color-line-soft: #e3e3e3;
+  --color-chip: #c9c9c9;
+  --color-surface: #eeeeee;
+  --color-ocean: #d4e2ec;
+  --color-ocean-strong: #a9c5da;
+}
+
+body {
+  @apply font-sans text-ink break-keep;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+/* 사이드바 전용: --spacing을 배율 단위로 바꾼 영역에서 피그마 px 값 그대로 글자 크기 지정 (최소 12px) */
+@utility fs-* {
+  font-size: max(12px, calc(var(--spacing) * --value(number)));
+}

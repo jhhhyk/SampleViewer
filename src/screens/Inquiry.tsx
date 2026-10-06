@@ -1,0 +1,39 @@
+import { InquiryForm, type InquiryContext } from "@/components/InquiryForm"
+import { IntroLayout } from "@/components/IntroLayout"
+
+const linkClass = "block text-[clamp(14px,1.8vh,16px)] font-bold underline underline-offset-4"
+
+export function Inquiry({
+  context,
+  onBack,
+  onHome,
+}: {
+  context: InquiryContext
+  onBack: () => void
+  onHome: () => void
+}) {
+  return (
+    <IntroLayout
+      fit
+      title={"스텔라비전\n위성 데이터 이용 문의"}
+      description={
+        <>
+          <p className="max-w-[297px]">관심 지역과 활용 목적을 기준으로 제공 가능한 데이터를 안내해드립니다.</p>
+          <div className="mt-[clamp(10px,2.2vh,24px)] flex flex-wrap items-start gap-x-5 gap-y-[10px] xl:flex-col">
+            <button onClick={onBack} className={linkClass}>
+              ← 샘플 재선택
+            </button>
+            <button onClick={onHome} className={linkClass}>
+              ← 처음으로 돌아가기
+            </button>
+          </div>
+        </>
+      }
+      mainWidth="906px"
+    >
+      <section className="flex h-full flex-col rounded-[3px] bg-surface xl:mt-[clamp(0px,5vh,54px)] xl:h-[calc(100%-clamp(0px,5vh,54px))]">
+        <InquiryForm context={context} onBack={onBack} />
+      </section>
+    </IntroLayout>
+  )
+}
