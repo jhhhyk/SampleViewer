@@ -12,20 +12,22 @@ type State = {
   sampleId: string | null
   /** 첫 화면에서 펼친 탐색 유형 */
   group: GroupId | null
+  /** 문의 화면에 샘플 화면의 상담 버튼으로 왔는지 (Contact Us면 false) */
+  fromSample: boolean
 }
 
 const firstSample = (field: FieldId | null, category: CategoryId | null) =>
   category ? (samplesFor(field, category)[0]?.id ?? null) : null
 
 /** 분야 진입·변경: 현재 카테고리에 샘플이 있으면 유지, 없으면 첫 이용 가능 카테고리 */
-function enterField(field: FieldId | null, current: CategoryId | null): Omit<State, "group"> {
+function enterField(field: FieldId | null, current: CategoryId | null): Omit<State, "group" | "fromSample"> {
   const available = availableCategories(field)
   const category = current && available.includes(current) ? current : (available[0] ?? null)
   return { screen: "samples", field, category, sampleId: firstSample(field, category) }
 }
 
 export default function App() {
-  const [state, setState] = useState<State>({ screen: "fields", field: null, category: null, sampleId: null, group: null })
+  const [state, setState] = useState<State>({ screen: "fields", field: null, category: null, sampleId: null, group: null, fromSample: false })
   const update = (patch: Partial<State>) => setState((s) => ({ ...s, ...patch }))
 
   const changeField = (f: FieldId | null) => update(enterField(f, state.category))
@@ -34,7 +36,7 @@ export default function App() {
 
   return (
     <div className="flex min-h-dvh flex-col [--header-h:56px] md:[--header-h:64px]">
-      <Header onHome={() => update({ screen: "fields", group: null })} onContact={() => update({ screen: "inquiry" })} />
+      <Header onHome={() => update({ screen: "fields", group: null })} onContact={() => update({ screen: "inquiry", fromSample: false })} />
 
       {state.screen === "fields" && (
         <FieldSelect
@@ -51,7 +53,7 @@ export default function App() {
           onField={changeField}
           onCategory={(c) => update({ category: c, sampleId: firstSample(state.field, c) })}
           onSample={(id) => update({ sampleId: id })}
-          onInquiry={() => update({ screen: "inquiry" })}
+          onInquiry={() => update({ screen: "inquiry", fromSample: true })}
         />
       )}
 
@@ -62,8 +64,7 @@ export default function App() {
             field: state.field,
             category: state.category,
           }}
-          // 샘플을 고른 적 없이(Contact Us) 들어왔으면 고를 곳인 첫 화면으로
-          onBack={() => update({ screen: state.category ? "samples" : "fields" })}
+          onBack={state.fromSample ? () => update({ screen: "samples" }) : undefined}
           onHome={() => update({ screen: "fields", group: null })}
         />
       )}

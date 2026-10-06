@@ -10,7 +10,7 @@ const controlClass = `${baseClass} h-[clamp(38px,5vh,46px)]`
 const areaClass = `${baseClass} min-h-[40px] flex-1 resize-none py-[clamp(6px,1vh,10px)]`
 
 /** 문의 맥락 요약 + 입력 폼 + 완료 예시. 실제 전송 없음 */
-export function InquiryForm({ context, onBack }: { context: InquiryContext; onBack: () => void }) {
+export function InquiryForm({ context, onBack, onHome }: { context: InquiryContext; onBack?: () => void; onHome: () => void }) {
   const [done, setDone] = useState(false)
 
   if (done) {
@@ -19,8 +19,8 @@ export function InquiryForm({ context, onBack }: { context: InquiryContext; onBa
         <p className="text-[14px] text-[#777]">목업 화면입니다. 실제로 전송되지 않았습니다.</p>
         <h2 className="text-[32px] font-bold tracking-[-1.5px]">문의 접수 완료 예시</h2>
         <p className="text-[18px]">입력하신 이메일로 제공 가능한 데이터를 안내해드립니다.</p>
-        <button onClick={onBack} className="mt-[16px] h-[56px] rounded-[3px] border border-line bg-white px-[32px] font-bold">
-          샘플 재선택
+        <button onClick={onBack ?? onHome} className="mt-[16px] h-[56px] rounded-[3px] border border-line bg-white px-[32px] font-bold">
+          {onBack ? "샘플 재선택" : "처음으로 돌아가기"}
         </button>
       </div>
     )
