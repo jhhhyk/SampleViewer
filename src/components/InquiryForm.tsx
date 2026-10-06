@@ -1,6 +1,8 @@
 import { useState, type ReactNode } from "react"
+import { CATEGORY_GROUPS, FIELDS, type CategoryId, type FieldId } from "@/data"
 
-export type InquiryContext = { field: string; category: string | null; sample: string | null; region: string }
+/** 보고 있던 맥락. 분야·카테고리는 선택란 초기값으로, 샘플은 상단 요약으로 */
+export type InquiryContext = { field: FieldId | null; category: CategoryId | null; sample: string | null }
 
 const inputClass = "w-full rounded-[3px] border border-line bg-white px-[12px] py-[clamp(6px,1vh,10px)] text-[15px] outline-none md:text-[16px] focus:border-ink user-invalid:border-red-500"
 
@@ -29,20 +31,41 @@ export function InquiryForm({ context, onBack }: { context: InquiryContext; onBa
         setDone(true)
       }}
     >
-      <dl className="flex flex-wrap gap-x-[32px] gap-y-1 rounded-[3px] bg-white px-[clamp(12px,1.5vw,20px)] py-[clamp(6px,1.3vh,14px)] text-[clamp(13px,1.5vh,15px)]">
-        <Summary label="분야" value={context.field} />
-        <Summary label="카테고리" value={context.category ?? "선택 없음"} />
-        <Summary label="샘플" value={context.sample ?? "선택 없음"} />
-      </dl>
+      {context.sample && (
+        <dl className="hidden rounded-[3px] bg-white sm:flex px-[clamp(12px,1.5vw,20px)] py-[clamp(6px,1.3vh,14px)] text-[clamp(13px,1.5vh,15px)]">
+          <Summary label="보고 있던 샘플" value={context.sample} />
+        </dl>
+      )}
 
-      <div className="grid grid-cols-2 gap-x-[clamp(10px,1.5vw,18px)] gap-y-[clamp(8px,1.7vh,18px)]">
+      <div className="grid grid-cols-2 gap-x-[clamp(10px,1.5vw,18px)] lg:grid-cols-3 gap-y-[clamp(8px,1.7vh,18px)]">
         <Field label="이름" required><input name="name" required autoComplete="name" className={inputClass} /></Field>
         <Field label="이메일" required><input name="email" type="email" required autoComplete="email" className={inputClass} /></Field>
-        <Field label="회사·기관명"><input name="org" autoComplete="organization" className={inputClass} /></Field>
-        <Field label="관심 지역" required><input name="region" required defaultValue={context.region} className={inputClass} /></Field>
+        <div className="col-span-2 lg:col-span-1">
+          <Field label="회사·기관명"><input name="org" autoComplete="organization" className={inputClass} /></Field>
+        </div>
+        <Field label="관심 분야" required>
+          <select name="field" required defaultValue={context.field ?? ""} className={inputClass}>
+            <option value="" disabled>선택해 주세요</option>
+            {FIELDS.map((f) => (
+              <option key={f.id} value={f.id}>{f.name}</option>
+            ))}
+          </select>
+        </Field>
+        <Field label="관심 카테고리">
+          <select name="category" defaultValue={context.category ?? ""} className={inputClass}>
+            <option value="">아직 정하지 않음</option>
+            {CATEGORY_GROUPS.map((g) => (
+              <optgroup key={g.id} label={g.name}>
+                {g.categories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+        </Field>
       </div>
-      <Field label="활용 목적" required grow><textarea name="purpose" required className={`${inputClass} min-h-[44px] flex-1 resize-none`} /></Field>
-      <Field label="추가 요청" grow><textarea name="extra" placeholder="기간, 범위, 필요한 결과 등" className={`${inputClass} min-h-[44px] flex-1 resize-none`} /></Field>
+      <Field label="활용 목적" required grow><textarea name="purpose" required rows={1} className={`${inputClass} min-h-[40px] flex-1 resize-none`} /></Field>
+      <Field label="추가 요청" grow><textarea name="extra" rows={1} placeholder="기간, 범위, 필요한 결과 등" className={`${inputClass} min-h-[40px] flex-1 resize-none`} /></Field>
 
       <button type="submit" className="h-[clamp(44px,6.5vh,70px)] shrink-0 rounded-[3px] bg-ink text-[16px] font-bold tracking-[-0.48px] text-white hover:bg-ink-strong">
         문의하기
@@ -63,7 +86,7 @@ function Summary({ label, value }: { label: string; value: string }) {
 /** grow: 남는 높이를 나눠 가짐 (textarea용) */
 function Field({ label, required, grow, children }: { label: string; required?: boolean; grow?: boolean; children: ReactNode }) {
   return (
-    <label className={`flex flex-col gap-[4px] text-[clamp(13px,1.6vh,15px)] font-medium ${grow ? "min-h-0 flex-1" : ""}`}>
+    <label className={`flex flex-col gap-[4px] text-[clamp(13px,1.6vh,15px)] font-medium ${grow ? "flex-1" : ""}`}>
       <span>
         {label}
         {required && <span className="text-red-500"> *</span>}

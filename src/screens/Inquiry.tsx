@@ -18,7 +18,8 @@ export function Inquiry({
       title={"스텔라비전\n위성 데이터 이용 문의"}
       description={
         <>
-          <p className="max-w-[297px]">관심 지역과 활용 목적을 기준으로 제공 가능한 데이터를 안내해드립니다.</p>
+          {/* 세로 배치에서 화면이 낮으면 폼 공간을 위해 숨김 */}
+          <p className="max-w-[297px] max-xl:[@media(max-height:720px)]:hidden">관심 분야와 활용 목적을 기준으로 제공 가능한 데이터를 안내해드립니다.</p>
           <div className="mt-[clamp(10px,2.2vh,24px)] flex flex-wrap items-start gap-x-5 gap-y-[10px] xl:flex-col">
             <button onClick={onBack} className={linkClass}>
               ← 샘플 재선택

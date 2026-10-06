@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { Header } from "@/components/Header"
-import { CATEGORIES, FIELDS, SAMPLES, availableCategories, samplesFor, type CategoryId, type FieldId, type GroupId } from "@/data"
+import { SAMPLES, availableCategories, samplesFor, type CategoryId, type FieldId, type GroupId } from "@/data"
 import { FieldSelect } from "@/screens/FieldSelect"
 import { Inquiry } from "@/screens/Inquiry"
 import { SampleView } from "@/screens/SampleView"
@@ -61,10 +61,9 @@ export default function App() {
         <Inquiry
           key={state.sampleId}
           context={{
-            field: FIELDS.find((f) => f.id === state.field)?.name ?? "전체 분야",
-            category: CATEGORIES.find((c) => c.id === state.category)?.name ?? null,
-            sample: sample?.title ?? null,
-            region: sample?.region ?? "",
+            field: state.field,
+            category: state.category,
+            sample: sample ? `${sample.title} · ${sample.region}` : null,
           }}
           // 샘플을 고른 적 없이(Contact Us) 들어왔으면 고를 곳인 첫 화면으로
           onBack={() => update({ screen: state.category ? "samples" : "fields" })}
