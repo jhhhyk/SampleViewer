@@ -11,7 +11,7 @@ const INQUIRY_ENDPOINT =
 const baseClass = "w-full rounded-md border border-input bg-background px-[12px] text-field outline-none focus:border-ring user-invalid:border-destructive"
 /** 한 줄 입력·선택란 공용 높이 */
 const controlClass = `${baseClass} h-[clamp(38px,5vh,46px)]`
-const areaClass = `${baseClass} min-h-[34px] flex-1 resize-none py-[clamp(6px,1vh,10px)]`
+const areaClass = `${baseClass} min-h-[34px] flex-1 max-md:min-h-24 resize-none py-[clamp(6px,1vh,10px)]`
 
 /** 문의 입력 폼 → Apps Script로 전송 → 완료 안내 */
 export function InquiryForm({ context, onBack, onHome }: { context: InquiryContext; onBack?: () => void; onHome: () => void }) {
@@ -86,8 +86,8 @@ export function InquiryForm({ context, onBack, onHome }: { context: InquiryConte
           </Select>
         </Field>
       </div>
-      {/* 세로 배치에서 화면이 낮으면 두 칸을 나란히 놓아 한 줄 절약 */}
-      <div className="flex flex-1 flex-col gap-[clamp(8px,1.7vh,18px)] max-xl:[@media(max-height:900px)]:flex-row">
+      {/* 태블릿·노트북 세로 배치에서 화면이 낮으면 두 칸을 나란히 놓아 한 줄 절약. 모바일은 폭이 좁아 세로 유지 */}
+      <div className="flex flex-1 flex-col gap-[clamp(8px,1.7vh,18px)] md:max-xl:[@media(max-height:900px)]:flex-row">
         <Field label="활용 목적" required className="flex-1">
           <textarea name="purpose" required rows={1} className={areaClass} />
         </Field>
@@ -154,7 +154,7 @@ function Consent() {
           <span className="text-destructive">[필수]</span> 개인정보 수집·이용에 동의합니다.
         </span>
       </label>
-      <button type="button" popoverTarget="privacy-notice" className="text-muted-foreground underline underline-offset-2">
+      <button type="button" popoverTarget="privacy-notice" className="shrink-0 whitespace-nowrap text-muted-foreground underline underline-offset-2">
         내용 보기
       </button>
       <div

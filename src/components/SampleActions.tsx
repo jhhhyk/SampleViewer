@@ -5,7 +5,7 @@ const base = "flex h-70 flex-1 items-center justify-center rounded-md border bor
 /** 샘플 데이터 받기 / 데이터 이용 상담 */
 export function SampleActions({ sample, onInquiry }: { sample: Sample | null; onInquiry: () => void }) {
   return (
-    <div className="flex gap-25 px-48 pb-26">
+    <div className="flex gap-25 px-48 pb-26 max-md:gap-12 max-md:px-20">
       {sample?.file ? (
         <a href={sample.file} download={`${sample.id}.png`} className={`${base} hover:bg-muted`}>
           샘플 데이터 받기

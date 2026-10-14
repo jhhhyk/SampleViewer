@@ -36,7 +36,7 @@ export function Inquiry({
       }
       mainWidth="906px"
     >
-      <section className="flex h-full flex-col rounded-md bg-muted xl:mt-[clamp(0px,5vh,54px)] xl:h-[calc(100%-clamp(0px,5vh,54px))]">
+      <section className="flex h-full flex-col rounded-md bg-muted max-md:h-auto xl:mt-[clamp(0px,5vh,54px)] xl:h-[calc(100%-clamp(0px,5vh,54px))]">
         <InquiryForm context={context} onBack={onBack} onHome={onHome} />
       </section>
     </IntroLayout>

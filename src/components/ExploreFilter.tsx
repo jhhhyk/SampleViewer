@@ -14,11 +14,11 @@ export function ExploreFilter({
   onSelect: (id: CategoryId) => void
 }) {
   return (
-    <fieldset className="px-74 pt-36">
+    <fieldset className="px-74 pt-36 max-md:px-20 max-md:pt-24">
       <legend className="float-left text-panel-title">탐색 필터</legend>
       <div className="clear-both flex flex-col gap-20 pt-21">
         {CATEGORY_GROUPS.map((g) => (
-          <div key={g.id} className="flex items-start gap-28">
+          <div key={g.id} className="flex items-start gap-28 max-md:gap-16">
             <span className="shrink-0 text-panel-label">{g.name}</span>
             <div className="flex flex-wrap gap-15">
               {g.categories.map((c) => (
@@ -42,7 +42,7 @@ function CategoryChip({ name, checked, disabled, onSelect }: { name: string; che
   return (
     <label
       title={disabled ? "이 분야의 샘플 없음" : undefined}
-      className="flex h-32 w-120 cursor-pointer items-center justify-center rounded-full bg-secondary text-panel-label whitespace-nowrap text-secondary-foreground transition-colors hover:not-has-checked:bg-secondary-hover has-checked:bg-primary has-checked:text-primary-foreground has-disabled:cursor-not-allowed has-disabled:bg-disabled has-disabled:text-disabled-foreground has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring"
+      className="flex h-32 w-120 cursor-pointer max-md:h-36 items-center justify-center rounded-full bg-secondary text-panel-label whitespace-nowrap text-secondary-foreground transition-colors hover:not-has-checked:bg-secondary-hover has-checked:bg-primary has-checked:text-primary-foreground has-disabled:cursor-not-allowed has-disabled:bg-disabled has-disabled:text-disabled-foreground has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring"
     >
       <input type="radio" name="category" className="sr-only" checked={checked} disabled={disabled} onChange={onSelect} />
       {name}

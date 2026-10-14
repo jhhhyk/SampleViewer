@@ -47,10 +47,11 @@ export function SampleView({
       {/*
         사이드바 배율 단위: --spacing = 피그마 1px. 패널 너비(649 기준)와 높이(내용 708 + 최소 여백 60 = 768 기준) 중
         작은 쪽에 맞춰 0.6~1배로 줄어 스크롤 없이 한 화면에 들어옴. 남는 높이는 아래 spacer들이 피그마 여백 비율로 나눠 가짐
+        모바일(md 미만)은 649 기준이면 0.6배까지 작아져 칩·글자가 너무 작음 → 420 기준으로 줄이고(375에서 약 0.89배) 여백은 max-md로 좁힘
       */}
-      <aside className="@container flex flex-col [--spacing:clamp(0.6px,100cqw/649,1px)] lg:w-[clamp(480px,35.6vw,649px)] lg:shrink-0 lg:overflow-y-auto lg:[container-type:size] lg:[--spacing:clamp(0.6px,min(100cqh/768,100cqw/649),1px)]">
+      <aside className="@container flex flex-col [--spacing:clamp(0.8px,100cqw/420,1px)] md:[--spacing:clamp(0.6px,100cqw/649,1px)] lg:w-[clamp(480px,35.6vw,649px)] lg:shrink-0 lg:overflow-y-auto lg:[container-type:size] lg:[--spacing:clamp(0.6px,min(100cqh/768,100cqw/649),1px)]">
         <div className="relative">
-          <label className="absolute top-36 right-64 flex items-center gap-8 text-panel-caption">
+          <label className="absolute top-36 right-64 flex max-md:top-24 max-md:right-20 items-center gap-8 text-panel-caption">
             활용 분야
             <select
               value={field ?? ""}
