@@ -85,7 +85,7 @@ Figma Tokens Studio ──Push / Pull (main)──┐
 - lh: `38` `41` `78`
 - ls: `negative-3-9` `negative-3-7` `negative-2-8` `negative-1-9` `negative-0-7` `negative-0-6`
 
-JSON에는 Figma 이름(`Inter`, `SemiBold`)으로 적고, CSS로 만들 때 웹폰트 이름(`"Inter Variable"`)과 숫자 굵기(600)로 바꿈.
+JSON에는 Figma 이름(`Inter`, `Semi Bold`)으로 적고 (굵기 이름은 Inter 기준: `Extra Light` `Semi Bold` `Extra Bold`처럼 띄어 씀), CSS로 만들 때 웹폰트 이름(`"Inter Variable"`)과 숫자 굵기(600)로 바꿈.
 
 | 토큰 | 폰트 | 상태 |
 |---|---|---|
