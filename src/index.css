@@ -23,6 +23,18 @@
   --font-weight-bold: var(--fw-700);
 }
 
+/* IntroLayout 2단 전환: 기본 xl, data-wide="lg"인 화면(첫 화면)은 lg부터 */
+@custom-variant wide {
+  @media (width >= 80rem) {
+    @slot;
+  }
+  @media (width >= 64rem) {
+    &:where([data-wide="lg"], [data-wide="lg"] *) {
+      @slot;
+    }
+  }
+}
+
 /* 숫자: 고정폭 + 빗금 0 */
 @utility type-num {
   font-family: var(--ff-num);

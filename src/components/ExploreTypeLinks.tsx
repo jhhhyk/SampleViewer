@@ -23,7 +23,7 @@ export function ExploreTypeLinks({
   const dim = (on: boolean) => (on ? "text-foreground-strong" : "text-foreground-subtle")
   // '활용 분야' 탭과 '탐색 유형' 제목 공용: 선택되면 1.15배 + 굵게 + 밑줄
   const tab = (on: boolean) =>
-    `block w-fit origin-left text-tab transition-[color,scale] motion-reduce:transition-none xl:ml-[9px] ${on ? "scale-115 font-bold" : ""} ${dim(on)}`
+    `block w-fit origin-left text-tab transition-[color,scale] motion-reduce:transition-none wide:ml-[9px] ${on ? "scale-115 font-bold" : ""} ${dim(on)}`
   const underline = (on: boolean) =>
     `mt-0.5 block h-[2px] w-full origin-left bg-accent-strong transition-[scale] motion-reduce:transition-none ${on ? "scale-x-100" : "scale-x-0"}`
 

@@ -24,9 +24,10 @@ export function FieldSelect({
       description="스텔라비전이 제공하는 위성 데이터 샘플과 주요 정보를 확인하고, 필요한 데이터의 제공 여부를 문의할 수 있습니다."
       links={<ExploreTypeLinks title="탐색 유형" selected={group} onSelect={onGroup} />}
       mainWidth="1030px"
+      wideFrom="lg"
     >
       <section className="flex h-full flex-col">
-        <h2 className="text-section-title xl:ml-[10px]">
+        <h2 className="text-section-title wide:ml-[10px]">
           {current ? `${current.name} 데이터` : "관심 있는 활용 분야"}
         </h2>
 

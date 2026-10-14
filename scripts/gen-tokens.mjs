@@ -23,7 +23,8 @@ const RESPONSIVE = {
   intro: (max) => ({ base: "clamp(14px, 2.1vh, var(--fs-18))", xl: `clamp(16px, min(1.2vw, 2vh), ${max})` }),
   "section-title": (max) => ({ base: `clamp(16px, 2.4vh, ${max})` }),
   tab: (max) => ({ base: `clamp(16px, 2.4vh, ${max})` }),
-  "card-title": (max) => ({ base: `clamp(22px, min(5.5vw, 5.2vh), ${max})`, xl: `clamp(28px, min(3.1vw, 5.2vh), ${max})` }),
+  // 분야 카드는 첫 화면이 2단이 되는 lg부터 데스크톱 크기 규칙
+  "card-title": (max) => ({ base: `clamp(22px, min(5.5vw, 5.2vh), ${max})`, lg: `clamp(28px, min(3.1vw, 5.2vh), ${max})` }),
   "card-note": (max) => ({ base: `clamp(12px, 1.5vh, ${max})` }),
   "thumb-label": (max) => ({ base: `clamp(15px, 1.42vw, ${max})` }),
   notice: (max) => ({ base: `clamp(13px, 1.5vh, ${max})` }),
