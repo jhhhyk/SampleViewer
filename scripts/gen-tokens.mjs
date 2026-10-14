@@ -8,9 +8,9 @@ const OUT = "src/styles/tokens.generated.css"
 
 /* ── Figma에 없는 정보 ───────────────────────────────────────────── */
 
-// Figma 폰트 이름 → 웹폰트 이름 (index.css에서 불러오는 패키지). 한글 글리프는 Pretendard로 이어짐
-const WEB_FONT = { Pretendard: "Pretendard Variable", Inter: "Inter Variable" }
-const HANGUL_FALLBACK = "Pretendard Variable"
+// Figma 폰트 이름 → 웹폰트 이름 (index.css에서 불러오는 패키지). 한글 글리프가 없는 폰트는 Noto Sans KR로 이어짐
+const WEB_FONT = { "Noto Sans KR": "Noto Sans KR Variable", Inter: "Inter Variable" }
+const HANGUL_FALLBACK = "Noto Sans KR Variable"
 
 const WEIGHT = { thin: 100, extralight: 200, light: 300, regular: 400, medium: 500, semibold: 600, bold: 700, extrabold: 800, black: 900 }
 

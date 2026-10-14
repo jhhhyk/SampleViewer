@@ -89,16 +89,18 @@ JSON에는 Figma 이름(`Inter`, `Semi Bold`)으로 적고 (굵기 이름은 Int
 
 | 토큰 | 폰트 | 상태 |
 |---|---|---|
-| `--ff-en` | Inter | **모든 글자** (`body`, 모든 텍스트 스타일). 한글은 Inter에 글리프가 없어 Pretendard로 표시 |
-| `--ff-num` | Inter + `tnum` `zero` | `type-num` (메타정보 값) |
-| `--ff-ko` | Pretendard | 직접 쓰지 않음 (en·num의 한글 fallback) |
+| `--ff-ko` | Noto Sans KR | **기본 글꼴** (`body`, 영문 전용 2개를 뺀 모든 텍스트 스타일) |
+| `--ff-en` | Inter | 영문 전용 스타일 `brand`(StellarVision), `type-label`(Sensor·Analytics·Drone) |
+| `--ff-num` | Inter + `tnum` `zero` | `type-num` (메타정보 값). Figma에는 없는 코드 전용 처리 |
 | `--ff-display` | Degular | 미설치(유료) — 사용 안 함 |
 
 사용 굵기: 400 · 500 · 600 · 700. Tailwind `font-medium/semibold/bold`도 `--fw-*`를 따름.
 
 ### 3-2. 텍스트 스타일 (Semantic)
 
-`tokens.json`의 `core.text.<이름>` → `@utility text-<이름>`. 값은 Figma(데스크톱) 기준. 모든 스타일의 폰트는 `ff.en`(Inter).
+`tokens.json`의 `core.text.<이름>` → `@utility text-<이름>`. 값은 Figma(데스크톱) 기준. 폰트는 `ff.ko`(Noto Sans KR), 영문만 쓰는 `brand`·`type-label`만 `ff.en`(Inter).
+
+Figma 텍스트 스타일은 글꼴을 하나만 지정할 수 있어서(웹처럼 한글만 다른 글꼴로 대체하는 기능이 없음), 한글이 들어가는 스타일은 한글 글꼴 하나로 통일함. Noto Sans KR은 Figma 기본 제공(Google Fonts)이라 설치 없이 쓸 수 있음.
 
 **반응형 처리** (생성 스크립트가 처리)
 - 고정: Primitive를 CSS 변수로 그대로 참조

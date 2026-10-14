@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
+@import "@fontsource-variable/noto-sans-kr";
 @import "@fontsource-variable/inter";
 
 /*
@@ -14,8 +14,8 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
-  /* 모든 글자 Inter. 한글은 Inter에 글리프가 없어 Pretendard로 표시 */
-  --font-sans: var(--ff-en);
+  /* 기본 글꼴 Noto Sans KR (Figma 텍스트 스타일과 동일). 영문 전용 스타일(brand, type-label)만 Inter */
+  --font-sans: var(--ff-ko);
 
   /* 굵기 강조(font-medium·bold)도 Primitive 값을 따름 */
   --font-weight-medium: var(--fw-500);
