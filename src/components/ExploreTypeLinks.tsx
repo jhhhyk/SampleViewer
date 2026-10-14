@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react"
-import ellipse from "@/assets/ellipse.svg"
 import { CATEGORY_GROUPS, type GroupId } from "@/data"
 
 /** 마우스가 이 거리(px) 안으로 들어오면 원이 진해지기 시작 */
@@ -69,13 +68,9 @@ export function ExploreTypeLinks({
             <span className={`text-type-label transition-[color,scale] group-hover:text-foreground group-aria-pressed:scale-110 group-aria-pressed:font-bold motion-reduce:transition-none ${dim(selected === g.id)}`}>
               {g.linkLabel}
             </span>
-            <img
+            <span
               data-circle
-              src={ellipse}
-              alt=""
-              width={88}
-              height={88}
-              className="size-[clamp(44px,8.1vh,88px)] rounded-full bg-[color-mix(in_srgb,var(--color-accent)_calc(var(--near,0)*100%),transparent)] transition-[scale] group-active:bg-accent group-aria-pressed:scale-115 group-aria-pressed:bg-accent-strong motion-reduce:transition-none"
+              className="size-[clamp(44px,8.1vh,88px)] rounded-full border border-border-active bg-[color-mix(in_srgb,var(--color-accent)_calc(var(--near,0)*100%),transparent)] transition-[scale] group-active:bg-accent group-aria-pressed:scale-115 group-aria-pressed:bg-accent-strong motion-reduce:transition-none"
             />
           </button>
         ))}

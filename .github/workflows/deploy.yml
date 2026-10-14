@@ -6,7 +6,8 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  # 피그마 Import로 생긴 토큰 세트를 합친 결과를 다시 커밋
+  contents: write
   pages: write
   id-token: write
 
@@ -27,6 +28,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run tokens:normalize
       - run: npm run build
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
@@ -34,3 +36,13 @@ jobs:
           path: dist
       - id: deployment
         uses: actions/deploy-pages@v4
+      # 배포가 끝난 뒤 정리된 tokens.json을 커밋 (GITHUB_TOKEN 커밋은 워크플로를 다시 실행하지 않음)
+      - name: Commit normalized tokens
+        if: github.event_name == 'push'
+        continue-on-error: true
+        run: |
+          git diff --quiet docs/tokens.json && exit 0
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "Merge token sets imported from Figma variables" docs/tokens.json
+          git push

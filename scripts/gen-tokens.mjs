@@ -44,6 +44,25 @@ for (const [set, groups] of Object.entries(json)) {
   for (const [g, v] of Object.entries(groups)) tokens[g] = { ...tokens[g], ...v }
 }
 
+// 같은 토큰이 여러 세트에서 다른 값이면 경고 (뒤에 오는 세트 값을 씀). Actions 로그에는 주석으로 표시
+{
+  const seen = {}
+  const walk = (o, path, set) => {
+    for (const [k, v] of Object.entries(o)) {
+      if (k.startsWith("$")) continue
+      const p = path ? `${path}.${k}` : k
+      if (v && typeof v === "object" && (v.value ?? v.$value) !== undefined) (seen[p] ||= []).push([set, JSON.stringify(v.value ?? v.$value).replace(/^"(-?[\d.]+)"$/, "$1")]) // "5"와 5는 같은 값
+      else if (v && typeof v === "object") walk(v, p, set)
+    }
+  }
+  for (const [set, groups] of Object.entries(json)) if (!set.startsWith("$")) walk(groups, "", set)
+  const dup = Object.entries(seen).filter(([, a]) => new Set(a.map(([, v]) => v)).size > 1)
+  if (dup.length) {
+    const msg = `세트 ${dup.length}개 토큰 값이 서로 다름 (뒤 세트 값을 씀): ${dup.slice(0, 5).map(([p, a]) => `${p} [${a.map(([s]) => s).join(" < ")}]`).join(", ")}${dup.length > 5 ? " …" : ""}. npm run tokens:normalize 로 정리`
+    console.warn(process.env.GITHUB_ACTIONS ? `::warning title=tokens.json::${msg}` : `⚠️  ${msg}`)
+  }
+}
+
 const val = (t) => t.$value ?? t.value // Tokens Studio 기본 형식과 W3C 형식 둘 다
 const isToken = (t) => t && typeof t === "object" && val(t) !== undefined
 /** 그룹 안의 토큰을 [이름, 토큰]으로 펼침 (하위 그룹은 이름을 -로 연결) */

@@ -15,7 +15,11 @@ Figma Tokens Studio ──Push / Pull (main)──┐
                      src/styles/tokens.generated.css   (git에 안 올림)
 ```
 
-- **Figma에서 수정**: Tokens Studio에서 Push → main에 커밋 → GitHub Pages 배포 빌드가 CSS를 만들어 바로 반영
+- **Figma에서 수정** (둘 중 아무거나)
+  - Tokens Studio 화면에서 토큰 값 수정 → Push
+  - Figma 변수·텍스트 스타일을 직접 수정 → Tokens Studio **Import variables / Import styles** → Push
+  - → main에 커밋 → GitHub Pages 배포 빌드가 CSS를 만들어 바로 반영
+  - **Push 뒤에는 Tokens Studio에서 Pull** (배포가 세트를 정리해 다시 커밋하므로, 아래 "세트 자동 정리")
 - **코드에서 수정**: `docs/tokens.json`을 고침 (생성된 CSS는 고치지 않음) → 푸시 → Figma에서 Pull
 - 로컬 개발 중 JSON을 바꿨거나 pull했다면 `npm run tokens` (dev 서버가 바뀐 CSS를 바로 반영)
 - 생성 파일에 들어가는 것: 색, `--radius`, 타이포 Primitive(`--ff-*` `--fw-*` `--fs-*` `--lh-*` `--ls-*` `--feat-*`), 텍스트 스타일 `@utility text-*`
@@ -31,6 +35,11 @@ Figma Tokens Studio ──Push / Pull (main)──┐
 ---
 
 ## 1. 색상
+
+> 2026-10-14부터 Stellarhub 팔레트(`Stellarhub_260506.css`) 적용. 아래 기존 이름들은 이제 Stellarhub semantic 토큰을 참조하며(예: `background` → `bg-page` → `bg-canvas`), 표의 hex는 적용 전 값. 현재 값은 `docs/tokens.json`의 `light` 세트가 기준
+> - Stellarhub primitive: `bg-canvas`, `surface-100~500`, `stroke-100~600`, `stroke-highlight`, `text-100~400`
+> - semantic: `bg-page`, `surface-*`, `border-*`, `text-*` / 컴포넌트: `button-*`, `card-*`, `input-*` (CSS 변수 이름은 원본 CSS와 같음)
+> - 탐색 유형 동그라미 테두리: `border-active`
 
 | 토큰 | Tailwind | 용도 | Light |
 |---|---|---|---|
@@ -183,6 +192,17 @@ Tailwind 기본 스케일 + 화면 높이 기반 `clamp`. 사이드바는 `--spa
 | File path | `docs/tokens.json` |
 
 토큰은 Fine-grained token, 이 저장소만, Contents Read and write.
+
+**세트 자동 정리**
+
+Import variables는 Figma 컬렉션·모드를 `컬렉션/모드` 이름의 세트로 가져온다. 이 파일의 세트(`core`, `light`)를 Export하면 컬렉션 `core`·모드 `core`가 되므로, Import하면 `core/core`·`light/light` 세트가 새로 생긴다.
+
+- 배포 워크플로가 Push마다 `npm run tokens:normalize`([scripts/normalize-tokens.mjs](../scripts/normalize-tokens.mjs))로 `X/X` 세트를 `X`에 합치고(가져온 값이 우선) 지운 뒤 다시 커밋한다 (커밋 메시지 "Merge token sets imported from Figma variables")
+- 그래서 저장소에는 항상 `core`, `light` 두 세트만 남는다. Tokens Studio에서 Pull하면 플러그인도 정리된 상태가 된다
+- Pull 없이 다시 Import·Push해도 가져온 값이 우선이라 결과는 맞다. 다만 Pull 전 플러그인의 옛 `core`/`light` 세트를 직접 고치면, 남아 있는 `core/core`가 그 값을 덮어쓰므로 **Push 뒤 Pull**을 습관으로
+- 모드가 여럿인 컬렉션(`colors/dark` 등)은 합치지 않는다
+- 같은 토큰이 여러 세트에서 값이 다르면 빌드 로그(Actions 경고)에 표시된다
+- Figma에서 지운 변수는 합칠 때 저장소에서 지워지지 않는다. 지우려면 Tokens Studio에서도 지우고 Push
 
 **주의**
 - 수식(`{radius.base} - 4` 등)은 `radius`의 sm~xl에만 쓸 수 있음. 다른 토큰 값에 수식을 넣으면 생성 단계에서 오류가 나서 배포가 멈춤
