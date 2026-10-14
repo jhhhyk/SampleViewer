@@ -60,7 +60,8 @@ Figma Tokens Studio ──Push / Pull (main)──┐
 
 | 토큰 | Tailwind | 용도 | Light |
 |---|---|---|---|
-| foreground-strong | `text-foreground-strong` | 강조 텍스트(헤더, 선택된 탭), primary hover | `#262626` |
+| foreground-strong | `text-foreground-strong` | 강조 텍스트(헤더, 선택된 탭) | `#262626` |
+| primary-hover | `bg-primary-hover` | 문의하기 버튼 hover (→ `button-bg-hover`) | — |
 | foreground-subtle | `text-foreground-subtle` | 선택 안 된 탭, 선택 전 select 문구 | `#9a9a9a` |
 | border-soft | `border-border-soft` | 헤더·하단 고정 영역 구분선 | `#e3e3e3` |
 | accent-strong | `bg-accent-strong` | 선택된 탭 밑줄·원 | `#a9c5da` |

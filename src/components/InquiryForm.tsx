@@ -109,7 +109,7 @@ export function InquiryForm({ context, onBack, onHome }: { context: InquiryConte
       <button
         type="submit"
         disabled={status === "sending"}
-        className="h-[clamp(44px,6.5vh,70px)] shrink-0 rounded-md bg-primary text-button text-primary-foreground hover:bg-foreground-strong disabled:cursor-wait disabled:opacity-70"
+        className="h-[clamp(44px,6.5vh,70px)] shrink-0 rounded-md bg-primary text-button text-primary-foreground hover:bg-primary-hover disabled:cursor-wait disabled:opacity-70"
       >
         {status === "sending" ? "전송 중…" : "문의하기"}
       </button>
