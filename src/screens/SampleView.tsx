@@ -37,9 +37,9 @@ export function SampleView({
             overlay={<SampleThumbnails samples={samples} selectedId={sample.id} onSelect={onSample} />}
           />
         ) : (
-          <div className="flex h-full flex-col items-center justify-center gap-[12px] bg-surface p-5 text-center">
-            <p className="text-[24px] font-bold">이 조건의 샘플이 없습니다.</p>
-            <p className="text-[18px]">{available.length ? "다른 카테고리를 선택하거나 " : "다른 분야를 선택하거나 "}데이터 이용 상담을 요청해 주세요.</p>
+          <div className="flex h-full flex-col items-center justify-center gap-[12px] bg-muted p-5 text-center">
+            <p className="text-heading">이 조건의 샘플이 없습니다.</p>
+            <p className="text-body-lg">{available.length ? "다른 카테고리를 선택하거나 " : "다른 분야를 선택하거나 "}데이터 이용 상담을 요청해 주세요.</p>
           </div>
         )}
       </section>
@@ -50,12 +50,12 @@ export function SampleView({
       */}
       <aside className="@container flex flex-col [--spacing:clamp(0.6px,100cqw/649,1px)] lg:w-[clamp(480px,35.6vw,649px)] lg:shrink-0 lg:overflow-y-auto lg:[container-type:size] lg:[--spacing:clamp(0.6px,min(100cqh/768,100cqw/649),1px)]">
         <div className="relative">
-          <label className="absolute top-36 right-64 flex items-center gap-8 fs-15 font-medium">
+          <label className="absolute top-36 right-64 flex items-center gap-8 text-panel-caption">
             활용 분야
             <select
               value={field ?? ""}
               onChange={(e) => onField((e.target.value || null) as FieldId | null)}
-              className="h-32 rounded-[3px] border border-line px-8 font-bold"
+              className="h-32 rounded-md border border-border px-8 font-bold"
             >
               <option value="">전체 분야</option>
               {FIELDS.map((f) => (
@@ -70,7 +70,7 @@ export function SampleView({
         {sample && <SampleDetail sample={sample} />}
         <div aria-hidden className="min-h-20 grow-104" />
 
-        <div className="sticky bottom-0 border-t border-line-soft bg-white pt-20 lg:border-t-0 lg:pt-0">
+        <div className="sticky bottom-0 border-t border-border-soft bg-background pt-20 lg:border-t-0 lg:pt-0">
           <SampleActions sample={sample} onInquiry={onInquiry} />
         </div>
       </aside>

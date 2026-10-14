@@ -6,10 +6,10 @@ export function FieldCard({ name, note, onSelect }: { name: string; note?: strin
   return (
     <button
       onClick={onSelect}
-      className="flex size-full flex-col items-center justify-center gap-2 rounded-[3px] text-center bg-surface text-[clamp(22px,min(5.5vw,5.2vh),56px)] font-medium tracking-[-0.05em] text-ink-strong transition-colors hover:bg-ocean focus-visible:bg-ocean active:bg-ocean active:brightness-95 xl:text-[clamp(28px,min(3.1vw,5.2vh),56px)]"
+      className="flex size-full flex-col items-center justify-center gap-2 rounded-md text-center bg-muted text-card-title text-accent-foreground transition-colors hover:bg-accent focus-visible:bg-accent active:bg-accent active:brightness-95"
     >
       {name}
-      {note && <span className="text-[clamp(12px,1.5vh,15px)] font-medium tracking-normal text-[#777]">{note}</span>}
+      {note && <span className="text-card-note text-muted-foreground">{note}</span>}
     </button>
   )
 }

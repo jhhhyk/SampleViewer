@@ -8,7 +8,7 @@ export type InquiryContext = { field: FieldId | null; category: CategoryId | nul
 const INQUIRY_ENDPOINT =
   "https://script.google.com/macros/s/AKfycbzby_Zi5__dqWObORjLFOoqEypoICcJBKKig2orJQN4CKeCQOIjECr3trISGgYcPvw/exec"
 
-const baseClass = "w-full rounded-[3px] border border-line bg-white px-[12px] text-[15px] outline-none md:text-[16px] focus:border-ink user-invalid:border-red-500"
+const baseClass = "w-full rounded-md border border-input bg-background px-[12px] text-field outline-none focus:border-ring user-invalid:border-destructive"
 /** 한 줄 입력·선택란 공용 높이 */
 const controlClass = `${baseClass} h-[clamp(38px,5vh,46px)]`
 const areaClass = `${baseClass} min-h-[34px] flex-1 resize-none py-[clamp(6px,1vh,10px)]`
@@ -20,9 +20,9 @@ export function InquiryForm({ context, onBack, onHome }: { context: InquiryConte
   if (status === "done") {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-[16px] p-5 text-center">
-        <h2 className="text-[32px] font-bold tracking-[-1.5px]">문의가 접수되었습니다</h2>
-        <p className="text-[18px]">입력하신 이메일로 제공 가능한 데이터를 안내해드립니다.</p>
-        <button onClick={onBack ?? onHome} className="mt-[16px] h-[56px] rounded-[3px] border border-line bg-white px-[32px] font-bold">
+        <h2 className="text-title">문의가 접수되었습니다</h2>
+        <p className="text-body-lg">입력하신 이메일로 제공 가능한 데이터를 안내해드립니다.</p>
+        <button onClick={onBack ?? onHome} className="mt-[16px] h-[56px] rounded-md border border-border bg-background px-[32px] text-button">
           {onBack ? "샘플 재선택" : "처음으로 돌아가기"}
         </button>
       </div>
@@ -102,14 +102,14 @@ export function InquiryForm({ context, onBack, onHome }: { context: InquiryConte
       <Consent />
 
       {status === "error" && (
-        <p role="alert" className="-mb-1 shrink-0 text-[14px] font-medium text-red-600">
+        <p role="alert" className="-mb-1 shrink-0 text-label text-destructive">
           전송하지 못했습니다. 잠시 후 다시 시도해 주세요. 입력하신 내용은 그대로 있습니다.
         </p>
       )}
       <button
         type="submit"
         disabled={status === "sending"}
-        className="h-[clamp(44px,6.5vh,70px)] shrink-0 rounded-[3px] bg-ink text-[16px] font-bold tracking-[-0.48px] text-white hover:bg-ink-strong disabled:cursor-wait disabled:opacity-70"
+        className="h-[clamp(44px,6.5vh,70px)] shrink-0 rounded-md bg-primary text-button text-primary-foreground hover:bg-foreground-strong disabled:cursor-wait disabled:opacity-70"
       >
         {status === "sending" ? "전송 중…" : "문의하기"}
       </button>
@@ -119,10 +119,10 @@ export function InquiryForm({ context, onBack, onHome }: { context: InquiryConte
 
 function Field({ label, required, className = "", children }: { label: string; required?: boolean; className?: string; children: ReactNode }) {
   return (
-    <label className={`flex flex-col gap-[4px] text-[clamp(13px,1.6vh,15px)] font-medium ${className}`}>
+    <label className={`flex flex-col gap-[4px] text-field-label ${className}`}>
       <span>
         {label}
-        {required && <span className="text-red-500"> *</span>}
+        {required && <span className="text-destructive"> *</span>}
       </span>
       {children}
     </label>
@@ -133,8 +133,8 @@ function Field({ label, required, className = "", children }: { label: string; r
 function Select(props: ComponentProps<"select">) {
   return (
     <span className="relative block">
-      <select {...props} className={`${controlClass} cursor-pointer appearance-none pr-9 invalid:text-[#9a9a9a] [&_option]:text-ink`} />
-      <svg aria-hidden viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-[#777]">
+      <select {...props} className={`${controlClass} cursor-pointer appearance-none pr-9 invalid:text-foreground-subtle [&_option]:text-foreground`} />
+      <svg aria-hidden viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" className="pointer-events-none absolute top-1/2 right-3 size-4 -translate-y-1/2 text-muted-foreground">
         <path d="M4 6l4 4 4-4" />
       </svg>
     </span>
@@ -147,22 +147,22 @@ function Select(props: ComponentProps<"select">) {
  */
 function Consent() {
   return (
-    <div className="flex shrink-0 items-center gap-2 text-[clamp(12px,1.5vh,14px)]">
+    <div className="flex shrink-0 items-center gap-2 text-consent">
       <label className="flex items-center gap-2 font-medium">
-        <input type="checkbox" name="consent" value="동의" required className="size-4 accent-ink" />
+        <input type="checkbox" name="consent" value="동의" required className="size-4 accent-primary" />
         <span>
-          <span className="text-red-500">[필수]</span> 개인정보 수집·이용에 동의합니다.
+          <span className="text-destructive">[필수]</span> 개인정보 수집·이용에 동의합니다.
         </span>
       </label>
-      <button type="button" popoverTarget="privacy-notice" className="text-[#777] underline underline-offset-2">
+      <button type="button" popoverTarget="privacy-notice" className="text-muted-foreground underline underline-offset-2">
         내용 보기
       </button>
       <div
         id="privacy-notice"
         popover="auto"
-        className="m-auto w-[min(92vw,460px)] rounded-[6px] border border-line bg-white p-6 text-[14px] leading-[1.7] text-ink shadow-xl backdrop:bg-black/30"
+        className="m-auto w-[min(92vw,460px)] rounded-lg border border-border bg-popover p-6 text-body-sm text-popover-foreground shadow-xl backdrop:bg-black/30"
       >
-        <h3 className="mb-3 text-[16px] font-bold">개인정보 수집·이용 안내</h3>
+        <h3 className="mb-3 text-subtitle">개인정보 수집·이용 안내</h3>
         <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5">
           <dt className="font-bold">수집 항목</dt>
           <dd>이름, 이메일, 회사·기관명(선택), 관심 분야·카테고리, 문의 내용</dd>
@@ -171,10 +171,10 @@ function Consent() {
           <dt className="font-bold">보유 기간</dt>
           <dd>회신 완료 후 1년간 보관 후 파기 (동의 철회 시 즉시 파기)</dd>
         </dl>
-        <p className="mt-3 text-[13px] text-[#777]">
+        <p className="mt-3 text-caption text-muted-foreground">
           동의를 거부할 수 있으며, 거부하시면 문의 접수가 제한됩니다.
         </p>
-        <button type="button" popoverTarget="privacy-notice" popoverTargetAction="hide" className="mt-4 h-10 w-full rounded-[3px] bg-ink font-bold text-white">
+        <button type="button" popoverTarget="privacy-notice" popoverTargetAction="hide" className="mt-4 h-10 w-full rounded-md bg-primary font-bold text-primary-foreground">
           확인
         </button>
       </div>

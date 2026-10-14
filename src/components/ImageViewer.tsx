@@ -56,14 +56,14 @@ export function ImageViewer({ src, alt, overlay }: { src: string; alt: string; o
       </div>
 
       {status !== "ready" && (
-        <p className="absolute inset-0 flex items-center justify-center text-[18px] text-white/70">
+        <p className="absolute inset-0 flex items-center justify-center text-body-lg text-white/70">
           {status === "loading" ? "영상을 불러오는 중…" : "영상을 불러오지 못했습니다."}
         </p>
       )}
 
       {overlay && <div className="absolute inset-x-0 top-3 md:top-[51px]">{overlay}</div>}
 
-      <div className="absolute right-3 bottom-3 md:right-[24px] md:bottom-[24px] flex overflow-hidden rounded-[3px] border border-white/30 bg-black/60 text-white">
+      <div className="absolute right-3 bottom-3 md:right-[24px] md:bottom-[24px] flex overflow-hidden rounded-md border border-white/30 bg-black/60 text-white">
         <ViewerButton label="확대" onClick={() => zoom(1.5)}>+</ViewerButton>
         <ViewerButton label="축소" onClick={() => zoom(1 / 1.5)}>−</ViewerButton>
         <ViewerButton label="초기화" onClick={reset}>초기화</ViewerButton>
@@ -74,7 +74,7 @@ export function ImageViewer({ src, alt, overlay }: { src: string; alt: string; o
 
 function ViewerButton({ label, onClick, children }: { label: string; onClick: () => void; children: ReactNode }) {
   return (
-    <button aria-label={label} onClick={onClick} className="h-[40px] min-w-[40px] px-[12px] text-[16px] hover:bg-white/15">
+    <button aria-label={label} onClick={onClick} className="h-[40px] min-w-[40px] px-[12px] text-body hover:bg-white/15">
       {children}
     </button>
   )

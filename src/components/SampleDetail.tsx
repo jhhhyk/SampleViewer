@@ -17,9 +17,9 @@ export function SampleDetail({ sample }: { sample: Sample }) {
   return (
     <>
       <section className="px-74">
-        <p className="fs-19 leading-32 font-bold tracking-[-0.06em]">{sample.title}</p>
-        <h2 className="mt-27 -ml-3 fs-56 leading-41 font-medium tracking-[-0.07em]">{sample.region}</h2>
-        <p className="mt-26 flex items-center gap-18 fs-27 leading-32 font-medium tracking-[-0.07em]">
+        <p className="text-panel-title">{sample.title}</p>
+        <h2 className="mt-27 -ml-3 text-panel-display">{sample.region}</h2>
+        <p className="mt-26 flex items-center gap-18 text-panel-subtitle">
           <span>{sample.date}</span>
           <img src={divider} alt="" width={24} height={3} className="rotate-90" />
           <span>{sample.country}</span>
@@ -29,13 +29,13 @@ export function SampleDetail({ sample }: { sample: Sample }) {
       <div aria-hidden className="min-h-16 grow-63" />
 
       <section className="pr-64 pl-74">
-        <h3 className="fs-19 leading-32 font-bold tracking-[-0.06em]">{sample.title} 세부 정보</h3>
+        <h3 className="text-panel-title">{sample.title} 세부 정보</h3>
         {/* 피그마 열 너비 83·83·83·139 비율 유지 */}
-        <dl className="mt-29 grid grid-cols-2 gap-x-41 gap-y-38 fs-16 leading-32 tracking-[-0.03em] @lg:grid-cols-[repeat(3,minmax(0,83fr))_minmax(0,139fr)] lg:grid-cols-[repeat(3,minmax(0,83fr))_minmax(0,139fr)]">
+        <dl className="mt-29 grid grid-cols-2 gap-x-41 gap-y-38 @lg:grid-cols-[repeat(3,minmax(0,83fr))_minmax(0,139fr)] lg:grid-cols-[repeat(3,minmax(0,83fr))_minmax(0,139fr)]">
           {META_ITEMS.map(({ key, label }) => (
             <div key={key}>
-              <dt className="font-medium whitespace-nowrap">{label}</dt>
-              <dd className="font-bold">{metaValue(sample.meta[key])}</dd>
+              <dt className="text-panel-body whitespace-nowrap">{label}</dt>
+              <dd className="text-panel-label type-num">{metaValue(sample.meta[key])}</dd>
             </div>
           ))}
         </dl>

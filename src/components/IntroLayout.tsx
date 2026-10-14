@@ -32,10 +32,10 @@ export function IntroLayout({
       style={{ "--main-w": mainWidth } as React.CSSProperties}
     >
       <div className="xl:col-start-1 xl:row-start-1 xl:pt-[clamp(0px,6.1vh,66px)]">
-        <h1 className="text-[clamp(24px,4.2vh,40px)] leading-[1.26] font-medium tracking-[-0.06em] whitespace-pre xl:text-[clamp(36px,min(3.4vw,5.7vh),62px)]">
+        <h1 className="text-display whitespace-pre">
           {title}
         </h1>
-        <div className="mt-[clamp(8px,2vh,24px)] max-w-[336px] text-[clamp(14px,2.1vh,18px)] leading-[1.73] font-medium tracking-[-0.07em] xl:mt-[clamp(16px,5.6vh,61px)] xl:ml-[7px] xl:text-[clamp(16px,min(1.2vw,2vh),22px)]">
+        <div className="mt-[clamp(8px,2vh,24px)] max-w-[336px] text-intro xl:mt-[clamp(16px,5.6vh,61px)] xl:ml-[7px]">
           {description}
         </div>
       </div>

@@ -26,7 +26,7 @@ export function FieldSelect({
       mainWidth="1030px"
     >
       <section className="flex h-full flex-col">
-        <h2 className="text-[clamp(16px,2.4vh,22px)] leading-[1.73] font-bold tracking-[-0.08em] xl:ml-[10px]">
+        <h2 className="text-section-title xl:ml-[10px]">
           {current ? `${current.name} 데이터` : "관심 있는 활용 분야"}
         </h2>
 

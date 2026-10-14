@@ -21,12 +21,12 @@ export function ExploreTypeLinks({
 }) {
   const circles = useRef<HTMLDivElement>(null)
   // 선택 안 된 쪽은 연하게
-  const dim = (on: boolean) => (on ? "text-ink-strong" : "text-[#9a9a9a]")
+  const dim = (on: boolean) => (on ? "text-foreground-strong" : "text-foreground-subtle")
   // '활용 분야' 탭과 '탐색 유형' 제목 공용: 선택되면 1.15배 + 굵게 + 밑줄
   const tab = (on: boolean) =>
-    `block w-fit origin-left text-[clamp(16px,2.4vh,22px)] leading-[1.73] tracking-[-0.03em] transition-[color,scale] motion-reduce:transition-none xl:ml-[9px] ${on ? "scale-115 font-bold" : "font-medium"} ${dim(on)}`
+    `block w-fit origin-left text-tab transition-[color,scale] motion-reduce:transition-none xl:ml-[9px] ${on ? "scale-115 font-bold" : ""} ${dim(on)}`
   const underline = (on: boolean) =>
-    `mt-0.5 block h-[2px] w-full origin-left bg-ocean-strong transition-[scale] motion-reduce:transition-none ${on ? "scale-x-100" : "scale-x-0"}`
+    `mt-0.5 block h-[2px] w-full origin-left bg-accent-strong transition-[scale] motion-reduce:transition-none ${on ? "scale-x-100" : "scale-x-0"}`
 
   useEffect(() => {
     // 리렌더 없이 CSS 변수만 갱신
@@ -47,7 +47,7 @@ export function ExploreTypeLinks({
       <button
         aria-pressed={selected === null}
         onClick={() => onSelect(null)}
-        className={`${tab(selected === null)} hover:text-ink`}
+        className={`${tab(selected === null)} hover:text-foreground`}
       >
         활용 분야
         <span className={underline(selected === null)} />
@@ -66,7 +66,7 @@ export function ExploreTypeLinks({
             onClick={() => onSelect(g.id)}
             className="group flex flex-col items-center gap-[clamp(6px,1.8vh,19px)] rounded-full"
           >
-            <span className={`text-[16px] font-medium tracking-[-0.05em] transition-[color,scale] group-hover:text-ink group-aria-pressed:scale-110 group-aria-pressed:font-bold motion-reduce:transition-none ${dim(selected === g.id)}`}>
+            <span className={`font-en text-type-label transition-[color,scale] group-hover:text-foreground group-aria-pressed:scale-110 group-aria-pressed:font-bold motion-reduce:transition-none ${dim(selected === g.id)}`}>
               {g.linkLabel}
             </span>
             <img
@@ -75,7 +75,7 @@ export function ExploreTypeLinks({
               alt=""
               width={88}
               height={88}
-              className="size-[clamp(44px,8.1vh,88px)] rounded-full bg-[color-mix(in_srgb,var(--color-ocean)_calc(var(--near,0)*100%),transparent)] transition-[scale] group-active:bg-ocean group-aria-pressed:scale-115 group-aria-pressed:bg-ocean-strong motion-reduce:transition-none"
+              className="size-[clamp(44px,8.1vh,88px)] rounded-full bg-[color-mix(in_srgb,var(--color-accent)_calc(var(--near,0)*100%),transparent)] transition-[scale] group-active:bg-accent group-aria-pressed:scale-115 group-aria-pressed:bg-accent-strong motion-reduce:transition-none"
             />
           </button>
         ))}
