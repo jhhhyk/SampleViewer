@@ -66,7 +66,7 @@ export function ExploreTypeLinks({
             onClick={() => onSelect(g.id)}
             className="group flex flex-col items-center gap-[clamp(6px,1.8vh,19px)] rounded-full"
           >
-            <span className={`font-en text-type-label transition-[color,scale] group-hover:text-foreground group-aria-pressed:scale-110 group-aria-pressed:font-bold motion-reduce:transition-none ${dim(selected === g.id)}`}>
+            <span className={`text-type-label transition-[color,scale] group-hover:text-foreground group-aria-pressed:scale-110 group-aria-pressed:font-bold motion-reduce:transition-none ${dim(selected === g.id)}`}>
               {g.linkLabel}
             </span>
             <img

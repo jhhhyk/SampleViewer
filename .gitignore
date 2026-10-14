@@ -4,3 +4,4 @@ dist
 .claude/
 .playwright-mcp/
 .DS_Store
+src/styles/tokens.generated.css

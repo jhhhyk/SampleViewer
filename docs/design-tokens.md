@@ -1,8 +1,26 @@
 # 디자인 토큰
 
 > Figma 스타일 ↔ Tailwind v4 토큰 1:1 매핑. 원본 템플릿: `design-tokens-template.md`
-> 코드: [src/index.css](../src/index.css), [src/styles/typography-primitives.css](../src/styles/typography-primitives.css)
-> Figma(Tokens Studio): [docs/tokens.json](tokens.json)
+
+## 0. 흐름 — 기준은 `docs/tokens.json` 하나
+
+```
+Figma Tokens Studio ──Push / Pull (main)──┐
+                                          ▼
+                                docs/tokens.json   ← 유일한 기준
+                                          ▲
+코드에서 직접 수정 ───────────────────────┘
+                                          │  npm run tokens (dev·build 전에 자동)
+                                          ▼
+                     src/styles/tokens.generated.css   (git에 안 올림)
+```
+
+- **Figma에서 수정**: Tokens Studio에서 Push → main에 커밋 → GitHub Pages 배포 빌드가 CSS를 만들어 바로 반영
+- **코드에서 수정**: `docs/tokens.json`을 고침 (생성된 CSS는 고치지 않음) → 푸시 → Figma에서 Pull
+- 로컬 개발 중 JSON을 바꿨거나 pull했다면 `npm run tokens` (dev 서버가 바뀐 CSS를 바로 반영)
+- 생성 파일에 들어가는 것: 색, `--radius`, 타이포 Primitive(`--ff-*` `--fw-*` `--fs-*` `--lh-*` `--ls-*` `--feat-*`), 텍스트 스타일 `@utility text-*`
+- [src/index.css](../src/index.css)에 남는 것: radius 단계(sm~xl 계산식), 기본 폰트, 굵기 클래스 매핑, `type-num`, body·포커스 기본값
+- Figma에 없는 정보(웹폰트 이름, 반응형 크기 규칙)는 [scripts/gen-tokens.mjs](../scripts/gen-tokens.mjs) 위쪽에 있음
 
 **규칙**
 - 토큰 이름은 Figma · CSS 변수 · Tailwind 클래스에서 동일 (`primary` → `--primary` → `bg-primary`)
@@ -62,36 +80,35 @@
 
 ### 3-1. Primitive
 
-[src/styles/typography-primitives.css](../src/styles/typography-primitives.css)를 그대로 사용. 원본에서 바꾼 것:
+`tokens.json`의 `core.ff` `fw` `fs` `lh` `ls` `feat`. 공용 Primitive 파일(`primitive-typography-token.css`)에서 시작했고, 이 프로젝트에만 있는 값을 추가함 (Exception)
+- fs: `19` `27` `56` `62`
+- lh: `38` `41` `78`
+- ls: `negative-3-9` `negative-3-7` `negative-2-8` `negative-1-9` `negative-0-7` `negative-0-6`
 
-- 폰트 이름: 웹폰트 패키지가 등록하는 이름을 앞에 추가 (`"Pretendard Variable"`, `"Inter Variable"`). en·num은 한글 fallback으로 Pretendard 추가
-- 이 프로젝트에만 있는 값을 "SampleViewer 추가분"으로 덧붙임 (Exception)
-  - fs: `19` `27` `56` `62`
-  - lh: `38` `41` `78`
-  - ls: `negative-3-9` `negative-3-7` `negative-2-8` `negative-1-9` `negative-0-7` `negative-0-6`
-- `.type-num`은 `@utility type-num`으로 옮김, 예시 클래스는 제외
+JSON에는 Figma 이름(`Inter`, `SemiBold`)으로 적고, CSS로 만들 때 웹폰트 이름(`"Inter Variable"`)과 숫자 굵기(600)로 바꿈.
 
 | 토큰 | 폰트 | 상태 |
 |---|---|---|
-| `--ff-ko` | Pretendard | 기본 (`body`, `font-sans`) |
-| `--ff-en` | Inter | 영문 전용 요소에 `font-en` (브랜드명, Contact Us, Sensor/Analytics/Drone) |
+| `--ff-en` | Inter | **모든 글자** (`body`, 모든 텍스트 스타일). 한글은 Inter에 글리프가 없어 Pretendard로 표시 |
 | `--ff-num` | Inter + `tnum` `zero` | `type-num` (메타정보 값) |
+| `--ff-ko` | Pretendard | 직접 쓰지 않음 (en·num의 한글 fallback) |
 | `--ff-display` | Degular | 미설치(유료) — 사용 안 함 |
 
 사용 굵기: 400 · 500 · 600 · 700. Tailwind `font-medium/semibold/bold`도 `--fw-*`를 따름.
 
 ### 3-2. 텍스트 스타일 (Semantic)
 
-`@utility text-<이름>` = Figma Text Style 이름. 값은 Figma(데스크톱) 기준.
+`tokens.json`의 `core.text.<이름>` → `@utility text-<이름>`. 값은 Figma(데스크톱) 기준. 모든 스타일의 폰트는 `ff.en`(Inter).
 
-**반응형 처리**
-- 고정: Primitive 직접 참조
-- 유동(clamp): 크기 최대값만 Primitive. 행간·자간은 크기에 비례해야 해서 비율·em으로 쓰고 주석에 대응 Primitive 기록
-- panel-*: 샘플 화면 사이드바 전용. `--spacing`이 피그마 1px인 영역에서 0.6~1배로 줄어듦 (최소 12px)
+**반응형 처리** (생성 스크립트가 처리)
+- 고정: Primitive를 CSS 변수로 그대로 참조
+- 반응형(스크립트의 `RESPONSIVE`에 있는 스타일): Figma 크기가 최대값. 행간·자간은 Figma 값을 크기 대비 비율·em으로 계산해서 크기와 함께 줄어듦
+- `panel-`로 시작하는 스타일: 샘플 화면 사이드바 전용. `--spacing`이 피그마 1px인 영역에서 0.6~1배로 줄어듦 (최소 12px)
+- Figma에서 새 텍스트 스타일을 만들면 고정 크기 유틸로 자동 생성됨. 화면에 따라 줄어들어야 하면 `RESPONSIVE`에 추가
 
 | 스타일 | 크기 | 행간 | 두께 | 자간 | 반응형 | 사용처 |
 |---|---|---|---|---|---|---|
-| brand | `fs-18` → md `fs-20` | — | 600 | `negative-0-4` | 고정 | 헤더 StellarVision |
+| brand | `fs-20` (md 미만 `fs-18`) | — | 600 | `negative-0-4` | 반응형 | 헤더 StellarVision |
 | title | `fs-32` | — | 700 | `negative-1-5` | 고정 | 문의 접수 완료 |
 | heading | `fs-24` | — | 700 | — | 고정 | 샘플 없음 안내 |
 | subtitle | `fs-16` | — | 700 | — | 고정 | 팝오버 제목 |
@@ -101,27 +118,27 @@
 | caption | `fs-13` | — | 400 | — | 고정 | 팝오버 부가 문구 |
 | label | `fs-14` | — | 500 | — | 고정 | Contact Us, 오류 문구 |
 | button | `fs-16` | — | 700 | `negative-0-5` | 고정 | 문의하기, 완료 화면 버튼 |
-| field | `fs-15` → md `fs-16` | — | 400 | — | 고정 | 입력창 |
+| field | `fs-16` (md 미만 `fs-15`) | — | 500 | — | 반응형 | 입력창 |
 | type-label | `fs-16` | — | 500 | `negative-0-8` | 고정 | Sensor·Analytics·Drone |
-| display | `fs-62` (모바일 최대 `fs-40`) | `lh-78` (1.26) | 500 | `negative-3-7` (-0.06em) | 유동 | 첫 화면·문의 h1 |
-| intro | `fs-22` (모바일 최대 `fs-18`) | `lh-38` (1.73) | 500 | `negative-1-5` (-0.07em) | 유동 | h1 아래 소개 |
-| section-title | `fs-22` | `lh-38` (1.73) | 700 | `negative-1-8` (-0.08em) | 유동 | 관심 있는 활용 분야 |
-| tab | `fs-22` | `lh-38` (1.73) | 500 (선택 700) | `negative-0-7` (-0.03em) | 유동 | 활용 분야 / 탐색 유형 탭 |
-| card-title | `fs-56` | — | 500 | `negative-2-8` (-0.05em) | 유동 | 분야·카테고리 카드 |
-| card-note | `fs-15` | — | 500 | `0` | 유동 | 샘플 준비 중 |
-| thumb-label | `fs-26` | — | 500 | `negative-1-3` (-0.05em) | 유동 | 썸네일 라벨 |
-| notice | `fs-15` | (상속 1.73) | 700 | `negative-0-6` (-0.04em) | 유동 | 회신 예정 안내 |
-| link | `fs-16` | (상속 1.73) | 700 | (상속 -0.07em) | 유동 | ← 처음으로 돌아가기 |
-| field-label | `fs-15` | — | 500 | — | 유동 | 폼 라벨 |
-| consent | `fs-14` | — | 400 | — | 유동 | 개인정보 동의 줄 |
-| panel-display | `fs-56` | `lh-41` | 500 | `negative-3-9` (-0.07em) | 사이드바 | 지역명 |
-| panel-title | `fs-19` | `lh-32` | 700 | `negative-1-1` (-0.06em) | 사이드바 | 탐색 필터, 샘플명 |
-| panel-subtitle | `fs-27` | `lh-32` | 500 | `negative-1-9` (-0.07em) | 사이드바 | 날짜 · 국가 |
-| panel-label | `fs-16` | `lh-32` | 700 | `negative-0-5` (-0.03em) | 사이드바 | 그룹명, 칩, 하단 버튼, 메타 값 |
-| panel-body | `fs-16` | `lh-32` | 500 | `negative-0-5` (-0.03em) | 사이드바 | 메타 항목명 |
+| display | `fs-62` (xl 미만 최대 `fs-40`) | `lh-78` | 500 | `negative-3-7` | 반응형 | 첫 화면·문의 h1 |
+| intro | `fs-22` (xl 미만 최대 `fs-18`) | `lh-38` | 500 | `negative-1-5` | 반응형 | h1 아래 소개 |
+| section-title | `fs-22` | `lh-38` | 700 | `negative-1-8` | 반응형 | 관심 있는 활용 분야 |
+| tab | `fs-22` | `lh-38` | 500 (선택 700) | `negative-0-7` | 반응형 | 활용 분야 / 탐색 유형 탭 |
+| card-title | `fs-56` | — | 500 | `negative-2-8` | 반응형 | 분야·카테고리 카드 |
+| card-note | `fs-15` | — | 500 | `0` | 반응형 | 샘플 준비 중 |
+| thumb-label | `fs-26` | — | 500 | `negative-1-3` | 반응형 | 썸네일 라벨 |
+| notice | `fs-15` | `lh-26` | 700 | `negative-0-6` | 반응형 | 회신 예정 안내 |
+| link | `fs-16` | `lh-28` | 700 | `negative-1-1` | 반응형 | ← 처음으로 돌아가기 |
+| field-label | `fs-15` | — | 500 | — | 반응형 | 폼 라벨 |
+| consent | `fs-14` | — | 400 | — | 반응형 | 개인정보 동의 줄 |
+| panel-display | `fs-56` | `lh-41` | 500 | `negative-3-9` | 사이드바 | 지역명 |
+| panel-title | `fs-19` | `lh-32` | 700 | `negative-1-1` | 사이드바 | 탐색 필터, 샘플명 |
+| panel-subtitle | `fs-27` | `lh-32` | 500 | `negative-1-9` | 사이드바 | 날짜 · 국가 |
+| panel-label | `fs-16` | `lh-32` | 700 | `negative-0-5` | 사이드바 | 그룹명, 칩, 하단 버튼, 메타 값 |
+| panel-body | `fs-16` | `lh-32` | 500 | `negative-0-5` | 사이드바 | 메타 항목명 |
 | panel-caption | `fs-15` | — | 500 | — | 사이드바 | 활용 분야 선택 |
 
-`—` = 지정 안 함(상속). Tokens Studio에서는 행간 `AUTO`, 자간 `ls.0`.
+`—` = 행간 `AUTO`(지정 안 함, 상속) / 자간 `ls.0`.
 
 ---
 
@@ -153,23 +170,28 @@ Tailwind 기본 스케일 + 화면 높이 기반 `clamp`. 사이드바는 `--spa
 
 ## 6. Tokens Studio
 
-[docs/tokens.json](tokens.json) — 세트 `core`(radius·ff·fw·fs·lh·ls·text) + `light`(color). 다크 세트 없음.
-Tokens Studio에서 테마 **Light** = core + light 로 만들고 `text.*`를 Figma Text Style로 내보냄.
+세트 `core`(radius·ff·feat·fw·fs·lh·ls·text) + `light`(color). 다크 세트 없음 → 두 세트를 모두 켜면 됨.
 
-재생성: `npm run tokens` ([scripts/gen-tokens.mjs](../scripts/gen-tokens.mjs)). 텍스트 스타일을 추가·변경하면 스크립트의 `STYLES` 표도 같이 수정.
+**GitHub 연결** (Settings → Sync providers → GitHub)
+
+| 항목 | 값 |
+|---|---|
+| Repository | `jhhhyk/SampleViewer` |
+| Branch | `main` (Push하면 바로 배포됨) |
+| File path | `docs/tokens.json` |
+
+토큰은 Fine-grained token, 이 저장소만, Contents Read and write.
+
+**주의**
+- 수식(`{radius.base} - 4` 등)은 `radius`의 sm~xl에만 쓸 수 있음. 다른 토큰 값에 수식을 넣으면 생성 단계에서 오류가 나서 배포가 멈춤
+- 텍스트 스타일 이름이 색 토큰 이름과 같으면 클래스가 겹쳐서 오류 처리함
+- 동시에 같은 값을 양쪽에서 고치면 git 충돌 → Pull 후 다시 Push
 
 ---
 
 ## 새 토큰 추가 체크리스트
 
-색상
-- [ ] `index.css` `:root`에 값
-- [ ] `@theme inline`에 `--color-<이름>`
-- [ ] `npm run tokens`
-- [ ] 이 문서 1장
-
-타이포그래피
-- [ ] `typography-primitives.css`에 Primitive (없을 때만, "SampleViewer 추가분"에)
-- [ ] `index.css`에 `@utility text-<이름>`
-- [ ] `scripts/gen-tokens.mjs` `STYLES`에 추가 후 `npm run tokens`
-- [ ] 이 문서 3장
+- [ ] `docs/tokens.json`(또는 Figma Tokens Studio)에 추가
+- [ ] 색: 이름이 `xxx` / `xxx-foreground` 쌍인지
+- [ ] 텍스트 스타일: 화면 크기에 따라 줄어들어야 하면 `scripts/gen-tokens.mjs`의 `RESPONSIVE`에 추가
+- [ ] 이 문서 표에 기록

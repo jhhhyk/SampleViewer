@@ -1,74 +1,161 @@
-// Primitive CSS + index.css 색 → Tokens Studio JSON. 실행: npm run tokens
-// ponytail: STYLES 표는 index.css의 @utility text-*를 손으로 옮긴 것. 스타일 추가·변경 시 같이 수정
+// docs/tokens.json(Tokens Studio, 기준) → src/styles/tokens.generated.css
+// 실행: npm run tokens (npm run dev / build 전에 자동 실행)
 import { readFileSync, writeFileSync } from "node:fs"
-const [prim, index, out] = ["src/styles/typography-primitives.css", "src/index.css", "docs/tokens.json"]
 
-const vars = (css) => Object.fromEntries([...css.matchAll(/--([\w-]+):\s*([^;]+);/g)].map((m) => [m[1], m[2].trim()]))
-const p = vars(readFileSync(prim, "utf8"))
-const root = vars(readFileSync(index, "utf8").split("@theme")[0])
+const SRC = "docs/tokens.json"
+const OUT = "src/styles/tokens.generated.css"
 
-const FIGMA_WEIGHT = { 100: "Thin", 200: "ExtraLight", 300: "Light", 400: "Regular", 500: "Medium", 600: "SemiBold", 700: "Bold", 800: "ExtraBold", 900: "Black" }
-const figmaFont = (v) => v.split(",")[1].trim().replaceAll('"', "") // "Pretendard Variable", "Pretendard", ... → Pretendard
-const group = (prefix, type, map = (v) => v.replace("px", "")) =>
-  Object.fromEntries(Object.entries(p).filter(([k]) => k.startsWith(prefix + "-")).map(([k, v]) => [k.slice(prefix.length + 1), { value: map(v), type }]))
+/* ── Figma에 없는 정보 ───────────────────────────────────────────── */
 
-const core = {
-  radius: {
-    base: { value: root.radius.replace("px", ""), type: "borderRadius" },
-    sm: { value: "{radius.base} - 4", type: "borderRadius" },
-    md: { value: "{radius.base} - 2", type: "borderRadius" },
-    lg: { value: "{radius.base}", type: "borderRadius" },
-    xl: { value: "{radius.base} + 4", type: "borderRadius" },
-  },
-  ff: Object.fromEntries(["ko", "en", "num", "display"].map((k) => [k, { value: k === "display" ? "Degular" : figmaFont(p["ff-" + k]), type: "fontFamilies" }])),
-  fw: group("fw", "fontWeights", (v) => FIGMA_WEIGHT[v]),
-  fs: group("fs", "fontSizes"),
-  lh: group("lh", "lineHeights"),
-  ls: group("ls", "letterSpacing"),
-  text: {},
+// Figma 폰트 이름 → 웹폰트 이름 (index.css에서 불러오는 패키지). 한글 글리프는 Pretendard로 이어짐
+const WEB_FONT = { Pretendard: "Pretendard Variable", Inter: "Inter Variable" }
+const HANGUL_FALLBACK = "Pretendard Variable"
+
+const WEIGHT = { thin: 100, extralight: 200, light: 300, regular: 400, medium: 500, semibold: 600, bold: 700, extrabold: 800, black: 900 }
+
+// 반응형 글자 크기. max = 그 스타일의 Figma 크기. base = 기본, md·xl = 그 너비 이상
+// 여기 있는 스타일은 행간·자간을 Figma 값에서 비율·em으로 바꿔 크기와 함께 줄어들게 함
+const RESPONSIVE = {
+  brand: (max) => ({ base: "var(--fs-18)", md: max }),
+  field: (max) => ({ base: "var(--fs-15)", md: max }),
+  display: (max) => ({ base: "clamp(24px, 4.2vh, var(--fs-40))", xl: `clamp(36px, min(3.4vw, 5.7vh), ${max})` }),
+  intro: (max) => ({ base: "clamp(14px, 2.1vh, var(--fs-18))", xl: `clamp(16px, min(1.2vw, 2vh), ${max})` }),
+  "section-title": (max) => ({ base: `clamp(16px, 2.4vh, ${max})` }),
+  tab: (max) => ({ base: `clamp(16px, 2.4vh, ${max})` }),
+  "card-title": (max) => ({ base: `clamp(22px, min(5.5vw, 5.2vh), ${max})`, xl: `clamp(28px, min(3.1vw, 5.2vh), ${max})` }),
+  "card-note": (max) => ({ base: `clamp(12px, 1.5vh, ${max})` }),
+  "thumb-label": (max) => ({ base: `clamp(15px, 1.42vw, ${max})` }),
+  notice: (max) => ({ base: `clamp(13px, 1.5vh, ${max})` }),
+  link: (max) => ({ base: `clamp(14px, 1.8vh, ${max})` }),
+  "field-label": (max) => ({ base: `clamp(13px, 1.6vh, ${max})` }),
+  consent: (max) => ({ base: `clamp(12px, 1.5vh, ${max})` }),
+}
+// "panel-"로 시작하는 스타일: 사이드바 배율(--spacing = 피그마 1px)로 크기·행간이 줄어듦 (최소 12px)
+const isPanel = (name) => name.startsWith("panel-")
+
+/* ── 토큰 읽기 ───────────────────────────────────────────────────── */
+
+const json = JSON.parse(readFileSync(SRC, "utf8"))
+// 세트(core, light …)를 그룹 단위로 합침. $themes·$metadata 제외
+const tokens = {}
+for (const [set, groups] of Object.entries(json)) {
+  if (set.startsWith("$")) continue
+  for (const [g, v] of Object.entries(groups)) tokens[g] = { ...tokens[g], ...v }
 }
 
-// [이름, ff, fw, fs, lh(null=AUTO), ls] — Figma(데스크톱 최대) 값. index.css의 @utility text-* 와 1:1
-const STYLES = [
-  ["brand", "en", 600, 20, null, "negative-0-4"],
-  ["title", "ko", 700, 32, null, "negative-1-5"],
-  ["heading", "ko", 700, 24, null, "0"],
-  ["subtitle", "ko", 700, 16, null, "0"],
-  ["body-lg", "ko", 400, 18, null, "0"],
-  ["body", "ko", 400, 16, null, "0"],
-  ["body-sm", "ko", 400, 14, 24, "0"],
-  ["caption", "ko", 400, 13, null, "0"],
-  ["label", "ko", 500, 14, null, "0"],
-  ["button", "ko", 700, 16, null, "negative-0-5"],
-  ["field", "ko", 400, 16, null, "0"],
-  ["type-label", "en", 500, 16, null, "negative-0-8"],
-  ["display", "ko", 500, 62, 78, "negative-3-7"],
-  ["intro", "ko", 500, 22, 38, "negative-1-5"],
-  ["section-title", "ko", 700, 22, 38, "negative-1-8"],
-  ["tab", "ko", 500, 22, 38, "negative-0-7"],
-  ["card-title", "ko", 500, 56, null, "negative-2-8"],
-  ["card-note", "ko", 500, 15, null, "0"],
-  ["thumb-label", "ko", 500, 26, null, "negative-1-3"],
-  ["notice", "ko", 700, 15, 26, "negative-0-6"],
-  ["link", "ko", 700, 16, 28, "negative-1-1"],
-  ["field-label", "ko", 500, 15, null, "0"],
-  ["consent", "ko", 400, 14, null, "0"],
-  ["panel-display", "ko", 500, 56, 41, "negative-3-9"],
-  ["panel-title", "ko", 700, 19, 32, "negative-1-1"],
-  ["panel-subtitle", "ko", 500, 27, 32, "negative-1-9"],
-  ["panel-label", "ko", 700, 16, 32, "negative-0-5"],
-  ["panel-body", "ko", 500, 16, 32, "negative-0-5"],
-  ["panel-caption", "ko", 500, 15, null, "0"],
-]
-for (const [name, ff, fw, fs, lh, ls] of STYLES) {
-  for (const [g, k] of [["fw", fw], ["fs", fs], ["lh", lh], ["ls", ls]]) if (k !== null && !core[g][k]) throw new Error(`${name}: ${g}-${k} 없음`)
-  core.text[name] = {
-    value: { fontFamily: `{ff.${ff}}`, fontWeight: `{fw.${fw}}`, fontSize: `{fs.${fs}}`, lineHeight: lh ? `{lh.${lh}}` : "AUTO", letterSpacing: `{ls.${ls}}` },
-    type: "typography",
+const val = (t) => t.$value ?? t.value // Tokens Studio 기본 형식과 W3C 형식 둘 다
+const isToken = (t) => t && typeof t === "object" && val(t) !== undefined
+/** 그룹 안의 토큰을 [이름, 토큰]으로 펼침 (하위 그룹은 이름을 -로 연결) */
+const flat = (obj, prefix = "") =>
+  Object.entries(obj ?? {}).flatMap(([k, t]) =>
+    k.startsWith("$") ? [] : isToken(t) ? [[prefix + k, t]] : flat(t, `${prefix}${k}-`),
+  )
+
+const REF = /^\{([^}]+)\}$/
+const refOf = (v) => (typeof v === "string" ? v.match(REF)?.[1] : undefined)
+function resolve(v) {
+  const ref = refOf(v)
+  if (ref === undefined) {
+    if (typeof v === "string" && v.includes("{")) throw new Error(`수식은 지원하지 않음: ${v}`)
+    return v
   }
+  const t = ref.split(".").reduce((o, k) => o?.[k], tokens)
+  if (!isToken(t)) throw new Error(`없는 토큰 참조: ${v}`)
+  return resolve(val(t))
+}
+/** 참조면 CSS 변수로, 아니면 fallback(값) */
+const varOr = (v, fallback) => {
+  const ref = refOf(v)
+  return ref ? `var(--${ref.replaceAll(".", "-")})` : fallback(resolve(v))
 }
 
-const light = { color: Object.fromEntries(Object.entries(root).filter(([k, v]) => v.startsWith("#")).map(([k, v]) => [k, { value: v, type: "color" }])) }
+const num = (v) => {
+  const n = parseFloat(v)
+  if (Number.isNaN(n)) throw new Error(`숫자가 아님: ${v}`)
+  return n
+}
+const round = (n) => +n.toFixed(4)
+const isPct = (v) => String(v).trim().endsWith("%")
+const isAuto = (v) => String(v).trim().toUpperCase() === "AUTO"
 
-writeFileSync(out, JSON.stringify({ core, light, $themes: [], $metadata: { tokenSetOrder: ["core", "light"] } }, null, 2) + "\n")
-console.log(Object.keys(core.text).length, "text styles,", Object.keys(light.color).length, "colors")
+const fontStack = (name) => {
+  const web = WEB_FONT[name]
+  const names = [web, name, web === HANGUL_FALLBACK ? null : HANGUL_FALLBACK].filter(Boolean)
+  return `${names.map((n) => `"${n}"`).join(", ")}, sans-serif`
+}
+const weight = (v) => {
+  if (!Number.isNaN(Number(v))) return Number(v)
+  const w = WEIGHT[String(v).toLowerCase().replace(/[\s_-]/g, "")]
+  if (!w) throw new Error(`모르는 굵기 이름: ${v}`)
+  return w
+}
+const lhCss = (v) => (isAuto(v) ? "normal" : isPct(v) ? v : `${num(v)}px`)
+const lsCss = (v) => (isPct(v) ? `${round(num(v) / 100)}em` : `${num(v)}px`)
+/** 행간을 글자 크기 대비 비율로 (AUTO면 null) */
+const lhRatio = (v, fs) => (isAuto(v) ? null : round(isPct(v) ? num(v) / 100 : num(v) / fs))
+const lsEm = (v, fs) => `${round(isPct(v) ? num(v) / 100 : num(v) / fs)}em`
+
+/* ── CSS 만들기 ──────────────────────────────────────────────────── */
+
+const root = []
+for (const [k, t] of flat(tokens.ff)) root.push(`--ff-${k}: ${fontStack(resolve(val(t)))};`)
+for (const [k, t] of flat(tokens.feat)) root.push(`--feat-${k}: ${resolve(val(t))};`)
+for (const [k, t] of flat(tokens.fw)) root.push(`--fw-${k}: ${weight(resolve(val(t)))};`)
+for (const [k, t] of flat(tokens.fs)) root.push(`--fs-${k}: ${num(resolve(val(t)))}px;`)
+for (const [k, t] of flat(tokens.lh)) root.push(`--lh-${k}: ${lhCss(resolve(val(t)))};`)
+for (const [k, t] of flat(tokens.ls)) root.push(`--ls-${k}: ${lsCss(resolve(val(t)))};`)
+// radius는 기준값만. sm~xl 계산식은 index.css
+root.push(`--radius: ${num(resolve(val(tokens.radius.base)))}px;`)
+const colors = flat(tokens.color)
+for (const [k, t] of colors) root.push(`--${k}: ${resolve(val(t))};`)
+
+const theme = colors.map(([k]) => `--color-${k}: var(--${k});`)
+
+const utilities = flat(tokens.text).map(([name, t]) => {
+  if (colors.some(([c]) => c === name)) throw new Error(`text-${name}: 같은 이름의 색 토큰과 클래스가 겹침`)
+  const s = val(t)
+  const fs = num(resolve(s.fontSize))
+  const lh = resolve(s.lineHeight ?? "AUTO")
+  const ls = s.letterSpacing ?? "0"
+  const decl = {
+    "font-family": varOr(s.fontFamily, fontStack),
+    "font-size": varOr(s.fontSize, (v) => `${num(v)}px`),
+    "line-height": isAuto(lh) ? null : varOr(s.lineHeight, lhCss),
+    "font-weight": varOr(s.fontWeight, weight),
+    "letter-spacing": varOr(ls, lsCss),
+  }
+  const variants = {}
+  if (isPanel(name)) {
+    decl["font-size"] = `max(12px, calc(var(--spacing) * ${fs}))`
+    const lhPx = isAuto(lh) ? null : isPct(lh) ? round((fs * num(lh)) / 100) : num(lh)
+    decl["line-height"] = lhPx === null ? null : `calc(var(--spacing) * ${lhPx})`
+    decl["letter-spacing"] = lsEm(resolve(ls), fs)
+  } else if (RESPONSIVE[name]) {
+    const { base, ...bp } = RESPONSIVE[name](decl["font-size"])
+    decl["font-size"] = base
+    Object.assign(variants, bp)
+    decl["line-height"] = lhRatio(lh, fs)
+    decl["letter-spacing"] = lsEm(resolve(ls), fs)
+  }
+  const body = Object.entries(decl)
+    .filter(([, v]) => v !== null)
+    .map(([p, v]) => `  ${p}: ${v};`)
+  for (const [bp, size] of Object.entries(variants)) body.push(`  @variant ${bp} {\n    font-size: ${size};\n  }`)
+  return `@utility text-${name} {\n${body.join("\n")}\n}`
+})
+
+const indent = (lines) => lines.map((l) => `  ${l}`).join("\n")
+const css = `/* 자동 생성 파일: ${SRC} → npm run tokens. 직접 고치지 말 것 */
+
+:root {
+${indent(root)}
+}
+
+@theme inline {
+${indent(theme)}
+}
+
+${utilities.join("\n")}
+`
+writeFileSync(OUT, css)
+console.log(`${OUT}: 변수 ${root.length}개, 텍스트 스타일 ${utilities.length}개`)
