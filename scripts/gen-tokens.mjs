@@ -1,6 +1,7 @@
 // docs/tokens.json(Tokens Studio, 기준) → src/styles/tokens.generated.css
 // 실행: npm run tokens (npm run dev / build 전에 자동 실행)
-import { readFileSync, writeFileSync } from "node:fs"
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs"
+import { dirname } from "node:path"
 
 const SRC = "docs/tokens.json"
 const OUT = "src/styles/tokens.generated.css"
@@ -157,5 +158,6 @@ ${indent(theme)}
 
 ${utilities.join("\n")}
 `
+mkdirSync(dirname(OUT), { recursive: true })
 writeFileSync(OUT, css)
 console.log(`${OUT}: 변수 ${root.length}개, 텍스트 스타일 ${utilities.length}개`)
